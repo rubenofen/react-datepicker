@@ -81,6 +81,10 @@ export default class DatePicker extends React.Component {
     className: PropTypes.string,
     customInput: PropTypes.element,
     customInputRef: PropTypes.string,
+    customInvalidFeedback: PropTypes.element,
+    customValidFeedback: PropTypes.element,
+    invalidMessage: PropTypes.string,
+    validMessage: PropTypes.string,
     // eslint-disable-next-line react/no-unused-prop-types
     dateFormat: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     dateFormatCalendar: PropTypes.string,
@@ -243,10 +247,10 @@ export default class DatePicker extends React.Component {
     this.props.openToDate
       ? this.props.openToDate
       : this.props.selectsEnd && this.props.startDate
-        ? this.props.startDate
-        : this.props.selectsStart && this.props.endDate
-          ? this.props.endDate
-          : newDate();
+      ? this.props.startDate
+      : this.props.selectsStart && this.props.endDate
+      ? this.props.endDate
+      : newDate();
 
   calcInitialState = () => {
     const defaultPreSelection = this.getPreSelection();
@@ -256,8 +260,8 @@ export default class DatePicker extends React.Component {
       minDate && isBefore(defaultPreSelection, minDate)
         ? minDate
         : maxDate && isAfter(defaultPreSelection, maxDate)
-          ? maxDate
-          : defaultPreSelection;
+        ? maxDate
+        : defaultPreSelection;
     return {
       open: this.props.startOpen || false,
       preventFocus: false,
@@ -686,8 +690,8 @@ export default class DatePicker extends React.Component {
       typeof this.props.value === "string"
         ? this.props.value
         : typeof this.state.inputValue === "string"
-          ? this.state.inputValue
-          : safeDateFormat(this.props.selected, this.props);
+        ? this.state.inputValue
+        : safeDateFormat(this.props.selected, this.props);
 
     return React.cloneElement(customInput, {
       [customInputRef]: input => {
@@ -729,6 +733,29 @@ export default class DatePicker extends React.Component {
     }
   };
 
+  renderInvalidFeedback = () => {
+    if (this.props.invalidMessage || this.props.customInvalidFeedback) {
+      const customInvalidFeedback = this.props.customInvalidFeedback || (
+        <div className="invalid-feedback">{this.props.invalidMessage}</div>
+      );
+      return customInvalidFeedback;
+    }
+  };
+
+  renderValidFeedback = () => {
+    if (this.props.validMessage || this.props.customValidFeedback) {
+      const customValidFeedback = this.props.customValidFeedback || (
+        <div className="valid-feedback">{this.props.validMessage}</div>
+      );
+      return customValidFeedback;
+    }
+  };
+
+  renderFeedBack = () => {
+    this.renderValidFeedback();
+    this.renderInvalidFeedback();
+  };
+
   render() {
     const calendar = this.renderCalendar();
 
@@ -743,6 +770,7 @@ export default class DatePicker extends React.Component {
             <div className="react-datepicker__input-container">
               {this.renderDateInput()}
               {this.renderClearButton()}
+              {this.renderFeedBack()}
             </div>
           ) : null}
           {this.state.open || this.props.inline ? (
@@ -761,6 +789,7 @@ export default class DatePicker extends React.Component {
           <div className="react-datepicker__input-container">
             {this.renderDateInput()}
             {this.renderClearButton()}
+            {this.renderFeedBack()}
           </div>
         }
         popperContainer={this.props.popperContainer}
